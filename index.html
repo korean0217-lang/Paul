@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>사도 바울과의 대화게임 - 디럭스</title>
+<style>
+
+:root{--ink:#2e241c;--gold:#e6b65b;--brown:#704629;--cream:#fff8e9;--paper:#fffdf7;--line:#dbc59e}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top,#f9efd8,#cbb28a 80%);color:var(--ink);font-family:'Gowun Dodum',sans-serif}
+#game{max-width:980px;margin:auto;min-height:100vh;background:var(--paper);box-shadow:0 0 40px #3b291533;overflow:hidden}
+header{padding:14px 18px;background:linear-gradient(135deg,#5d3a23,#8d5d36);color:#fff;display:flex;align-items:center;gap:14px}
+.logo{font-family:Jua;font-size:25px;white-space:nowrap}.headright{flex:1}.stage{font-size:13px;opacity:.9}.meter{height:8px;background:#ffffff33;border-radius:99px;overflow:hidden;margin-top:5px}.meter>i{display:block;height:100%;background:var(--gold);width:0%;transition:.5s}
+main{min-height:calc(100vh - 70px);padding:18px}
+.scene{position:relative;min-height:245px;border-radius:22px;overflow:hidden;background:linear-gradient(#bfe0ef 0 62%,#d8b878 63%);border:3px solid #e4cfaa;box-shadow:inset 0 -25px 0 #c99d58}
+.sun{position:absolute;width:70px;height:70px;border-radius:50%;background:#ffe28b;right:8%;top:10%;box-shadow:0 0 30px #ffe28b}
+.cloud{position:absolute;background:#fff9;border-radius:99px;width:120px;height:32px;top:25px;animation:cloud 16s linear infinite}.cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}.cloud:before{width:45px;height:45px;left:22px;top:-18px}.cloud:after{width:55px;height:55px;right:16px;top:-25px}.c2{top:80px;left:35%;animation-duration:22s}.c3{top:35px;left:70%;animation-duration:19s}@keyframes cloud{from{transform:translateX(-140px)}to{transform:translateX(1100px)}}
+.road{position:absolute;bottom:0;left:0;right:0;height:78px;background:#c9a05e;clip-path:polygon(37% 0,63% 0,100% 100%,0 100%)}
+.char{position:absolute;bottom:8px;left:7%;height:220px;filter:drop-shadow(0 7px 4px #4a321633);transition:.4s}.char.talk{animation:bob .7s infinite alternate}@keyframes bob{to{transform:translateY(-8px)}}
+.char.small{height:180px;left:auto;right:7%}
+.speech{margin:-20px auto 0;position:relative;max-width:820px;background:white;border:3px solid #8b623d;border-radius:22px;padding:18px 20px 16px;box-shadow:0 8px 0 #8b623d22;z-index:4}
+.speech:after{content:"";position:absolute;left:70px;bottom:-18px;border:10px solid transparent;border-top-color:#8b623d}
+.who{font-family:Jua;color:#7b4a2b;font-size:20px}.text{font-size:20px;line-height:1.55;margin-top:6px;min-height:62px}
+.listen{float:right;margin-top:-34px;border:0;border-radius:99px;padding:7px 12px;background:#f3dfb7;color:#603d25;cursor:pointer}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.choice{border:2px solid var(--line);border-radius:16px;background:#fff;padding:16px;text-align:left;font:17px 'Gowun Dodum';cursor:pointer;transition:.2s;box-shadow:0 3px 0 #0000000a}
+.choice:hover{transform:translateY(-2px);background:#fff5dc;border-color:#bd9150}.choice:disabled{cursor:default;opacity:.55}.choice.selected{background:#f5e2b9;border-color:#8b5a2b;opacity:1}
+.feedback{display:none;margin-top:15px;padding:15px 17px;border-radius:15px;background:#f7efdf;border-left:5px solid #b57b37;line-height:1.6}
+.next{display:none;margin-top:12px;width:100%;padding:15px;border:0;border-radius:15px;background:#744729;color:#fff;font:20px Jua;cursor:pointer}
+.stats{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.tag{background:#eee1c8;border-radius:99px;padding:6px 10px;font-size:12px}
+.start,.end,.routecard{text-align:center;padding:25px 10px}.start h2,.end h2{font:30px Jua;color:#704629}.start p,.end p{font-size:17px;line-height:1.7}
+.hero{height:250px;display:block;margin:0 auto;filter:drop-shadow(0 12px 6px #0002)}.startbtn,.again{border:0;border-radius:15px;background:#744729;color:white;padding:16px 30px;font:21px Jua;cursor:pointer}
+.verse{background:#f7efdf;border-left:5px solid #b47a35;padding:15px;margin:18px auto;max-width:720px;text-align:left}
+.routegrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:20px 0}.route{padding:10px 5px;border-radius:12px;background:#f3ead9;border:1px solid #ddc9a6;font-size:12px}.route b{display:block;font:18px Jua;color:#744729}
+.routecard{display:none}.routecard.show{display:block}.routeicon{font-size:52px}
+.shipscene{height:330px;position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(#9dd0e8 0 55%,#6fb5ce 56%);border:3px solid #e2c995}.waves{position:absolute;bottom:0;height:130px;width:200%;background:repeating-radial-gradient(ellipse at 20% 20%,transparent 0 20px,#ffffff55 22px 27px,transparent 29px 50px);animation:waves 4s linear infinite}@keyframes waves{to{transform:translateX(-180px)}}
+.boat{position:absolute;bottom:68px;left:42%;font-size:100px;animation:rock 1.4s ease-in-out infinite}@keyframes rock{50%{transform:rotate(-4deg) translateY(-5px)}}
+.rome{position:absolute;right:7%;bottom:70px;font-size:95px;filter:drop-shadow(0 5px 3px #0002)}
+.fire{position:absolute;left:10%;bottom:65px;font-size:60px;animation:flame .5s infinite alternate}@keyframes flame{to{transform:scale(1.12)}}
+.timeline{display:flex;gap:5px;margin:14px 0}.dot{height:8px;flex:1;background:#eadfc8;border-radius:99px}.dot.on{background:#c98b3c}
+
+/* 모바일 게임 UX */
+#game{transition:opacity .25s ease,transform .25s ease}.fadeOut{opacity:0;transform:scale(.985)}
+.toptools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.tool{border:0;border-radius:999px;padding:6px 9px;background:#ffffff22;color:#fff;font-size:12px;cursor:pointer}.tool:active{transform:scale(.96)}
+.charWrap{position:absolute;bottom:8px;left:7%;height:220px;transition:.4s;filter:drop-shadow(0 7px 4px #4a321633)}
+.charWrap .char{position:relative;left:auto;bottom:auto;height:220px;display:block}.charWrap.talk{animation:bob .7s infinite alternate}
+.mouth{position:absolute;width:14px;height:7px;left:50%;top:45%;margin-left:-7px;border-radius:0 0 10px 10px;background:#6d2d22;opacity:0;transform:scaleY(.4);transition:.08s}
+.talking .mouth{opacity:.8;animation:mouth 0.16s infinite alternate}@keyframes mouth{to{transform:scaleY(1.4);height:9px}}
+.sceneTransition{animation:sceneIn .45s ease}@keyframes sceneIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.choice:active{transform:scale(.98)}
+.savebar{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}.savebar button{border:1px solid #d8c29e;background:#fff7e7;color:#704629;border-radius:10px;padding:7px 10px;font:13px 'Gowun Dodum';cursor:pointer}
+.resume{margin:14px auto 0;padding:12px;border-radius:14px;background:#f5ead7;border:1px dashed #bb8b50;max-width:650px}
+.endingChoice{font-size:16px;margin-top:8px}
+@media(max-width:700px){.charWrap{height:185px;left:2%}.charWrap .char{height:185px}.mouth{top:45%;}.toptools{gap:4px}.tool{padding:6px 8px}}
+
+@media(max-width:700px){.choices{grid-template-columns:1fr}.scene{min-height:215px}.char{height:185px;left:2%}.char.small{height:145px;right:2%}.text{font-size:18px}.speech{padding:15px}.logo{font-size:20px}.routegrid{grid-template-columns:repeat(2,1fr)}}
+</style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#5b3924">
+</head>
+<body>
+<div id="game">
+<header><div class="logo">📜 사도 바울과의 대화</div><div class="headright"><div class="stage" id="stage">게임 시작</div><div class="meter"><i id="meter"></i></div></div><div class="toptools"><button class="tool" onclick="toggleMusic()" id="musicBtn">🎵</button><button class="tool" onclick="saveGame()">💾</button><button class="tool" onclick="loadGame()">↩️</button></div></header>
+<main id="main"></main>
+</div>
+
+<script>
+const A="assets/";
+const paulPos={main:"paul_main.png",book:"paul_book.png",writer:"paul_writer.png",teacher:"paul_teacher.png",prayer:"paul_prayer.png",wave:"paul_wave.png",think:"paul_think.png",table:"paul_table.png",scroll:"paul_scroll.png"};
+
+const shared=[
+{scene:"예루살렘 · 스데반의 재판",pos:"think",who:"청년 사울",q:"왜 당신은 스데반이 죽을 때 유대인의 편에 섰는가?",a:[
+["A","유대인이 무서워서","두려움이 내 판단에 영향을 주었습니다.",0,2,0,0],
+["B","유대인 무리에게 인정받고 싶어서","사람에게 인정받으려는 마음이 있었습니다.",0,0,0,2],
+["C","스데반의 말이 하나님을 대적한다고 생각해서","나는 그것이 하나님을 위한 열심이라고 확신했습니다.",2,1,0,0],
+["D","그냥 그래야 할 것 같아서","나는 군중과 시대의 흐름을 따라갔습니다.",0,0,1,1]]},
+{scene:"다메섹으로 가는 길",pos:"main",who:"사울",q:"예수님을 믿는 사람들을 박해할 때, 무엇이 가장 중요하다고 생각했는가?",a:[
+["A","율법에 대한 열심","하나님께 충성한다고 생각했습니다.",2,1,0,0],
+["B","나의 명예","내가 옳다는 것을 증명하고 싶었습니다.",0,1,0,2],
+["C","사람들의 안전","내가 지킨다고 생각했지만 오히려 상처를 주었습니다.",0,0,0,2],
+["D","명령에 순종하는 것","다른 사람의 명령과 분위기를 따랐습니다.",0,0,2,0]]},
+{scene:"다메섹 도상",pos:"prayer",who:"사울",q:"하늘에서 빛이 비추고 예수님의 음성을 들었다. 첫 마음은?",a:[
+["A","두려움","내가 잘못된 길에 있었음을 깨닫기 시작했습니다.",1,2,0,0],
+["B","충격과 혼란","내가 알고 있던 세계가 흔들렸습니다.",2,0,0,0],
+["C","회개","주님 앞에서 나의 길을 돌이키고 싶었습니다.",2,1,1,0],
+["D","침묵","아무 말도 할 수 없이 기다렸습니다.",1,0,1,0]]},
+{scene:"다메섹 · 아나니아의 집",pos:"prayer",who:"아나니아",q:"나를 두려워하는 사람이 도움을 준다면 어떻게 반응하겠는가?",a:[
+["A","겸손하게 도움을 받는다","새로운 삶은 도움을 받아들이는 데서 시작되었습니다.",1,0,0,2],
+["B","내 힘으로 해결한다","아직도 내 능력을 의지하려는 마음이 남아 있었습니다.",0,2,1,0],
+["C","왜 나를 돕는지 묻는다","관계의 문을 열기 위해 대화하겠습니다.",0,0,0,2],
+["D","하나님께 감사한다","은혜로 다시 일어났음을 인정하겠습니다.",2,0,1,1]]},
+{scene:"안디옥 교회",pos:"main",who:"바울",q:"처음 복음을 전할 때 가장 중요하게 생각할 것은?",a:[
+["A","성경을 정확하게 가르치는 것","말씀을 바르게 세우는 길을 택합니다.",2,0,0,0],
+["B","한 사람을 깊이 세우는 것","사람을 세우는 관계를 중요하게 여깁니다.",0,0,0,2],
+["C","아직 복음을 듣지 못한 지역으로 가는 것","개척의 길을 선택합니다.",0,1,2,0],
+["D","어려운 사람에게 복음을 삶으로 보여주는 것","사랑과 섬김으로 증언합니다.",0,1,1,2]]},
+{scene:"첫 번째 선교여행",pos:"wave",who:"바울",q:"낯선 도시로 떠날 때 가장 먼저 준비할 것은?",a:[
+["A","말씀과 가르침","어디서든 복음을 설명할 준비를 합니다.",2,0,1,0],
+["B","동역자와의 신뢰","혼자가 아니라 함께 가겠습니다.",0,0,0,2],
+["C","새로운 길과 장소","아무도 가지 않은 곳을 찾아갑니다.",0,1,2,0],
+["D","위험에 대한 대비","고난을 예상하고 담대하게 준비합니다.",0,2,1,0]]},
+{scene:"빌립보의 감옥",pos:"prayer",who:"바울",q:"감옥에 갇혔을 때 무엇을 하겠는가?",a:[
+["A","기도하고 찬송한다","환경보다 하나님을 바라보겠습니다.",2,1,0,0],
+["B","동료를 먼저 격려한다","함께 있는 사람을 세우겠습니다.",0,1,0,2],
+["C","간수에게 복음을 전한다","고난의 자리도 선교의 자리로 봅니다.",0,2,2,0],
+["D","하나님의 뜻을 기다린다","급하게 결론 내리지 않겠습니다.",2,0,1,0]]},
+{scene:"아테네",pos:"teacher",who:"바울",q:"사람들이 낯선 신을 섬기는 도시에서 어떻게 복음을 전하겠는가?",a:[
+["A","그들의 문화에서 접점을 찾는다","상대가 이해할 수 있는 언어로 복음을 연결합니다.",1,1,1,2],
+["B","잘못을 강하게 지적한다","진리를 분명하게 선포합니다.",2,2,0,0],
+["C","먼저 질문하고 듣는다","상대의 생각을 이해한 뒤 대화합니다.",0,0,0,2],
+["D","복음의 핵심을 간결하게 전한다","창조주와 부활을 중심으로 전합니다.",2,1,2,0]]}
+];
+
+const routes={
+teacher:{name:"말씀의 교사",icon:"📖",desc:"말씀을 깊이 가르치며 교회를 세우는 바울",pos:"writer",qs:[
+["고린도","교회가 복음의 핵심을 잊고 있다면?",["A. 다시 십자가의 복음을 가르친다","B. 성경 공부를 조직한다","C. 지도자를 세운다","D. 편지를 보내 마음을 일깨운다"]],
+["갈라디아","다른 복음이 들어오면?",["A. 단호하게 경고한다","B. 성경으로 논증한다","C. 사랑으로 설명한다","D. 지도자들과 함께 대응한다"]],
+["로마서","멀리 있는 성도에게 가장 필요한 것은?",["A. 복음의 원리","B. 믿음과 행위의 관계","C. 서로 용납하는 법","D. 선교의 비전"]],
+["말씀","사람들이 당신의 말을 오해한다면?",["A. 더 명확히 설명한다","B. 글로 남긴다","C. 직접 만나 대화한다","D. 하나님께 맡긴다"]],
+["동역","젊은 사역자를 만난다면?",["A. 말씀을 가르친다","B. 실전 사역을 맡긴다","C. 실패해도 기다린다","D. 함께 기도한다"]],
+["핍박","복음을 가르친다는 이유로 공격받는다면?",["A. 진리를 포기하지 않는다","B. 지혜롭게 피한다","C. 다른 곳에서 가르친다","D. 공격자에게도 복음을 전한다"]],
+["교회","교회가 성장했다면 다음 목표는?",["A. 말씀을 더 깊게 한다","B. 지도자를 양성한다","C. 다른 지역을 돕는다","D. 선교사를 파송한다"]],
+["마지막","자신의 삶을 한 문장으로 말한다면?",["A. 말씀으로 사람을 세웠다","B. 복음을 정확히 전했다","C. 교회를 다음 세대에 맡겼다","D. 배운 것을 삶으로 보였다"]]]},
+pastor:{name:"사람을 세우는 목회자",icon:"❤️",desc:"상처 입은 사람을 품고 동역자를 세우는 바울",pos:"wave",qs:[
+["고린도","성도들 사이에 갈등이 생긴다면?",["A. 먼저 듣는다","B. 진리를 가르친다","C. 서로 화해하도록 돕는다","D. 중재자를 세운다"]],
+["동역자","마가와 갈등이 생긴다면?",["A. 다시 기회를 준다","B. 잠시 거리를 둔다","C. 함께 대화한다","D. 사역에 맞게 역할을 나눈다"]],
+["교회","낙심한 성도를 만난다면?",["A. 곁에 있어준다","B. 말씀을 나눈다","C. 함께 기도한다","D. 작은 역할부터 맡긴다"]],
+["훈련","새 지도자를 세운다면?",["A. 인격을 먼저 본다","B. 말씀을 가르친다","C. 실제 사역을 맡긴다","D. 실패를 기다려준다"]],
+["용서","나를 심하게 비난한 사람이 돌아온다면?",["A. 용서한다","B. 먼저 진실을 확인한다","C. 관계를 회복한다","D. 다시 공동체에 세운다"]],
+["편지","멀리 있는 교회에 편지를 쓴다면?",["A. 격려한다","B. 잘못을 바로잡는다","C. 서로 사랑하라고 권한다","D. 선교를 독려한다"]],
+["고난","동역자가 지쳐 있다면?",["A. 쉬게 한다","B. 함께 짐을 진다","C. 기도한다","D. 새로운 동역자를 붙인다"]],
+["마지막","자신의 삶을 한 문장으로 말한다면?",["A. 사람을 사랑했다","B. 사람을 세웠다","C. 함께 울고 함께 기뻐했다","D. 혼자보다 함께 걸었다"]]]},
+pioneer:{name:"개척 선교사",icon:"🗺️",desc:"아직 복음이 닿지 않은 곳을 향해 나아가는 바울",pos:"scroll",qs:[
+["선교지","아직 복음이 전해지지 않은 곳이 있다면?",["A. 즉시 간다","B. 현지인을 먼저 세운다","C. 동역자를 모은다","D. 정보를 조사한다"]],
+["여행","새로운 도시를 선택한다면?",["A. 큰 도시","B. 작은 마을","C. 교통의 중심지","D. 가장 어려운 지역"]],
+["문화","낯선 문화를 만난다면?",["A. 먼저 듣는다","B. 공통점을 찾는다","C. 복음의 핵심은 지킨다","D. 현지인에게 배운다"]],
+["자원","돈과 사람이 부족하다면?",["A. 작게 시작한다","B. 자비량으로 일한다","C. 동역자를 기다린다","D. 하나님께 기도한다"]],
+["거절","복음을 거절당한다면?",["A. 다른 사람에게 간다","B. 다시 설명한다","C. 관계를 쌓는다","D. 낙심하지 않는다"]],
+["위험","선교지에서 위험이 커진다면?",["A. 지혜롭게 이동한다","B. 남아 섬긴다","C. 현지 지도자에게 맡긴다","D. 기도하며 결정한다"]],
+["열매","작은 교회가 세워졌다면?",["A. 지도자를 세운다","B. 다음 지역으로 간다","C. 계속 방문한다","D. 다른 교회와 연결한다"]],
+["마지막","자신의 삶을 한 문장으로 말한다면?",["A. 아무도 가지 않은 길을 갔다","B. 복음의 씨앗을 뿌렸다","C. 땅끝을 향했다","D. 다음 세대가 이어가게 했다"]]]},
+witness:{name:"고난의 증인",icon:"🔥",desc:"박해와 재판 속에서도 담대하게 복음을 증언하는 바울",pos:"prayer",qs:[
+["재판","총독 앞에 서게 된다면?",["A. 담대히 증언한다","B. 지혜롭게 질문한다","C. 복음의 핵심을 말한다","D. 나의 간증을 나눈다"]],
+["박해","사람들이 돌을 던진다면?",["A. 하나님께 기도한다","B. 피할 길을 찾는다","C. 동료를 보호한다","D. 다시 복음을 전한다"]],
+["감옥","감옥에 오래 갇힌다면?",["A. 편지를 쓴다","B. 찬송한다","C. 사람을 가르친다","D. 다음 사역을 준비한다"]],
+["두려움","두려움이 밀려온다면?",["A. 하나님의 약속을 붙든다","B. 동역자에게 말한다","C. 기도한다","D. 한 걸음씩 간다"]],
+["죽음","죽음이 가까워졌다고 느낀다면?",["A. 사명을 돌아본다","B. 동역자를 격려한다","C. 믿음을 고백한다","D. 복음을 마지막까지 전한다"]],
+["폭풍","배가 침몰할 위기라면?",["A. 사람들에게 소망을 준다","B. 질서를 세운다","C. 함께 기도한다","D. 하나님이 살리실 것을 믿는다"]],
+["로마","재판을 기다리는 동안?",["A. 복음을 가르친다","B. 방문객을 맞는다","C. 편지를 쓴다","D. 기도한다"]],
+["마지막","자신의 삶을 한 문장으로 말한다면?",["A. 믿음을 지켰다","B. 끝까지 달렸다","C. 두려움보다 복음을 선택했다","D. 어떤 환경에서도 증언했다"]]]},
+bridge:{name:"화해와 연결의 사도",icon:"🌉",desc:"유대인과 이방인, 교회와 교회를 연결하는 바울",pos:"teacher",qs:[
+["갈등","유대인과 이방인이 서로 다투면?",["A. 서로의 이야기를 듣게 한다","B. 복음 안의 공통점을 가르친다","C. 식탁을 함께 마련한다","D. 지도자들이 함께 기도하게 한다"]],
+["문화","서로 다른 관습이 충돌한다면?",["A. 서로 존중하게 한다","B. 복음의 본질과 관습을 구분한다","C. 약한 사람을 배려한다","D. 공동체의 합의를 만든다"]],
+["교회","두 교회가 경쟁한다면?",["A. 서로의 필요를 나누게 한다","B. 공동 사역을 만든다","C. 서로 방문하게 한다","D. 복음의 한 몸임을 가르친다"]],
+["도시","낯선 사람들에게 복음을 전한다면?",["A. 그들의 언어로 설명한다","B. 그들의 질문을 듣는다","C. 관계부터 만든다","D. 삶으로 보여준다"]],
+["헌금","어려움에 처한 교회를 돕는다면?",["A. 모금한다","B. 다른 교회와 연결한다","C. 직접 전달한다","D. 지속적인 나눔을 만든다"]],
+["오해","당신의 사역을 오해한다면?",["A. 직접 만난다","B. 편지를 쓴다","C. 공통된 목표를 찾는다","D. 시간이 해결하도록 기다린다"]],
+["동역","서로 다른 성격의 사역자와 함께한다면?",["A. 역할을 나눈다","B. 장점을 살린다","C. 갈등을 대화로 푼다","D. 함께 기도한다"]],
+["마지막","자신의 삶을 한 문장으로 말한다면?",["A. 서로를 연결했다","B. 장벽을 낮췄다","C. 그리스도 안에서 하나 되게 했다","D. 복음이 사람 사이를 흐르게 했다"]]]}
+};
+
+const rome=[
+{scene:"로마로 향하는 배",pos:"wave",who:"바울",q:"큰 풍랑이 일어났다. 사람들에게 가장 먼저 무엇을 말하겠는가?",a:[
+["A","두려워하지 마십시오. 하나님이 함께하십니다.","소망을 선포합니다.",1,2,1,0],
+["B","배를 버리지 말고 질서를 지킵시다.","믿음과 지혜를 함께 선택합니다.",0,1,1,1],
+["C","함께 기도합시다.","공동체가 하나님을 바라보게 합니다.",2,0,0,2],
+["D","하나님께서 우리를 살리실 것입니다.","약속을 붙듭니다.",2,2,0,0]]},
+{scene:"로마의 길",pos:"scroll",who:"바울",q:"로마에서 만날 사람들에게 어떤 메시지를 준비하겠는가?",a:[
+["A","예수 그리스도의 복음","복음의 중심을 분명히 합니다.",2,1,1,0],
+["B","하나님 나라의 소망","어려운 시대에도 소망을 전합니다.",1,2,1,0],
+["C","서로 사랑하라는 권면","교회가 하나 되도록 돕습니다.",0,1,0,2],
+["D","나의 회심과 간증","은혜로 변화된 삶을 나눕니다.",1,2,1,2]]},
+{scene:"로마 · 셋집",pos:"table",who:"바울",q:"감옥 같은 환경에서도 문을 열고 사람을 맞이한다면?",a:[
+["A","성경을 가르친다","말씀을 전합니다.",2,0,1,0],
+["B","복음을 전한다","만나는 사람에게 예수를 전합니다.",1,2,2,0],
+["C","성도들을 격려한다","공동체를 세웁니다.",0,1,0,2],
+["D","편지를 쓴다","멀리까지 복음을 흘려보냅니다.",2,1,2,1]]},
+{scene:"로마 · 마지막 장면",pos:"main",who:"바울",q:"이제 당신의 삶을 한 문장으로 남긴다면?",a:[
+["A","나는 복음을 위해 달려갔다.","사명을 끝까지 붙들었습니다.",2,2,2,0],
+["B","나는 은혜로 변화된 사람이었다.","과거보다 은혜가 더 컸습니다.",2,1,1,1],
+["C","나는 사람을 세우며 걸었다.","동역자와 교회를 사랑했습니다.",0,1,1,2],
+["D","나는 어디서든 예수를 전했다.","장소와 환경은 복음을 막지 못했습니다.",1,2,2,1]]}
+];
+
+let idx=0, phase="start", routeKey=null, score={faith:0,courage:0,mission:0,relationship:0}, history=[];
+const main=document.getElementById("main"), meter=document.getElementById("meter"), stage=document.getElementById("stage");
+
+function addScore(a){score.faith+=a[3];score.courage+=a[4];score.mission+=a[5];score.relationship+=a[6];history.push(a[0]);}
+function progress(){meter.style.width=((idx)/20*100)+"%";stage.textContent=`질문 ${Math.min(idx+1,20)} / 20 · ${routeKey?routes[routeKey].name:"사울의 변화"}`}
+
+function start(){
+ initAudio(); if(audioCtx&&audioCtx.state==="suspended")audioCtx.resume(); if(!musicOn)toggleMusic(); successSound();
+ idx=0;phase="shared";routeKey=null;score={faith:0,courage:0,mission:0,relationship:0};history=[];
+ renderQuestion(shared[0]);
+}
+function paulImg(pos="main",cls="char"){return `<img class="${cls}" src="${A+paulPos[pos]}" alt="사도 바울 캐릭터">`}
+function charMarkup(pos="main",cls="charWrap"){return `<div class="${cls}">${paulImg(pos,"char")}<i class="mouth"></i></div>`}
+let audioCtx=null, musicTimer=null, musicOn=false;
+function initAudio(){if(audioCtx)return;try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){audioCtx=null}}
+function tone(freq,dur=.12,type="sine",vol=.035){if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur)}
+function clickSound(){initAudio();tone(520,.07,"triangle",.045)}
+function successSound(){initAudio();tone(523,.12);setTimeout(()=>tone(659,.14),110);setTimeout(()=>tone(784,.18),230)}
+function toggleMusic(){initAudio();if(!audioCtx)return;if(audioCtx.state==="suspended")audioCtx.resume();musicOn=!musicOn;document.getElementById("musicBtn")?.replaceChildren(document.createTextNode(musicOn?"🔊":"🎵"));if(musicOn){let n=0;clearInterval(musicTimer);musicTimer=setInterval(()=>{if(!musicOn)return;const notes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23];tone(notes[n++%notes.length],.32,"sine",.018)},620)}else clearInterval(musicTimer)}
+function saveGame(){try{localStorage.setItem("paulDialogueSave",JSON.stringify({idx,phase,routeKey,score,history}));clickSound();toast("게임이 저장되었습니다.");}catch(e){toast("저장할 수 없습니다.")}}
+function loadGame(){try{const raw=localStorage.getItem("paulDialogueSave");if(!raw){toast("저장된 게임이 없습니다.");return}const d=JSON.parse(raw);idx=d.idx;phase=d.phase;routeKey=d.routeKey;score=d.score||{faith:0,courage:0,mission:0,relationship:0};history=d.history||[];if(phase==="start"){renderStart();return}if(phase==="shared"||phase==="route"||phase==="rome"){if(phase==="route" && idx===8){showRouteIntro();}else if(phase==="rome"&&idx===16){renderRomeScene();}else renderQuestion(currentQ());}toast("저장된 게임을 이어갑니다.");}catch(e){toast("저장 데이터가 손상되었습니다.")}}
+function toast(msg){const d=document.createElement("div");d.textContent=msg;Object.assign(d.style,{position:"fixed",left:"50%",bottom:"22px",transform:"translateX(-50%)",background:"#4f3322",color:"white",padding:"10px 16px",borderRadius:"999px",zIndex:99,boxShadow:"0 5px 20px #0004"});document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
+function transition(fn){const g=document.getElementById("game");g.classList.add("fadeOut");setTimeout(()=>{fn();g.classList.remove("fadeOut")},230)}
+function renderStart(){
+ stage.textContent="게임 시작";meter.style.width="0%";
+ const has=!!localStorage.getItem("paulDialogueSave");
+ main.innerHTML=`<section class="start sceneTransition">
+ <div class="scene"><div class="sun"></div><div class="cloud"></div><div class="cloud c2"></div><div class="cloud c3"></div>${charMarkup("main","char small")}</div>
+ <h2>청년 사울을 만나 보세요</h2>
+ <p>당신이 사울에게 질문하면, 사울은 자신의 마음을 이야기합니다.<br><b>20번의 선택</b>이 사울의 삶을 서로 다른 방향으로 바꾸어 놓습니다.</p>
+ <div class="routegrid"><div class="route"><b>📖</b>말씀의 교사</div><div class="route"><b>❤️</b>사람을 세우는 목회자</div><div class="route"><b>🗺️</b>개척 선교사</div><div class="route"><b>🔥</b>고난의 증인</div><div class="route"><b>🌉</b>화해와 연결</div></div>
+ <div class="verse"><b>게임의 목표</b><br>선택에 따라 삶의 방향은 달라지지만, 마지막에는 모든 길이 <b>로마</b>로 이어집니다.</div>
+ <button class="startbtn" onclick="start()">대화 시작하기 ▶</button>
+ ${has?`<div class="resume">💾 저장된 게임이 있습니다.<br><button class="startbtn endingChoice" onclick="loadGame()">저장된 게임 이어하기</button></div>`:""}
+ </section>`;
+}
+
+function renderQuestion(q){
+ progress();
+ const speaker=q.who||"바울";
+ const img=q.pos||"main";
+ main.innerHTML=`<section class="sceneTransition">
+ <div class="scene">
+  <div class="sun"></div><div class="cloud"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <div class="road"></div>${charMarkup(img,"charWrap talk")}
+ </div>
+ <div class="speech"><button class="listen" onclick="speakCurrent()">🔊 듣기</button><div class="who">${speaker}</div><div class="text" id="dialog"></div></div>
+ <div class="choices" id="choices">${q.a.map((a,i)=>`<button class="choice" onclick="choose(${i})"><b>${a[0]}</b> ${a[1]}</button>`).join("")}</div>
+ <div class="feedback" id="feedback"></div>
+ <button class="next" id="next" onclick="nextQuestion()">다음 이야기로 ▶</button>
+ <div class="stats"><span class="tag">믿음 ${score.faith}</span><span class="tag">담대함 ${score.courage}</span><span class="tag">선교 ${score.mission}</span><span class="tag">관계 ${score.relationship}</span></div><div class="savebar"><button onclick="saveGame()">💾 현재 진행 저장</button><button onclick="toggleMusic()">🎵 배경음악 켜기/끄기</button></div>
+ </section>`;
+ typeText(q.q);
+}
+function typeText(t){
+ const el=document.getElementById("dialog");let i=0;el.textContent="";
+ const wrap=document.querySelector(".charWrap"); if(wrap) wrap.classList.add("talking");
+ const timer=setInterval(()=>{el.textContent=t.slice(0,++i);if(i>=t.length){clearInterval(timer);if(wrap)wrap.classList.remove("talking")}},24);
+}
+
+function currentQ(){
+ if(phase==="shared")return shared[idx];
+ if(phase==="route"){const rq=routes[routeKey].qs[idx-8];const weights=[[2,0,2,0],[0,1,0,2],[1,1,2,0],[0,2,1,0]];return {scene:rq[0],pos:routes[routeKey].pos,who:"바울",q:rq[1],a:rq[2].map((x,i)=>[x.slice(0,2),x.slice(3),`이 선택은 <b>${routes[routeKey].name}</b>의 삶을 더 선명하게 만듭니다.`,...weights[i]])};}
+ if(phase==="rome")return rome[idx-16];
+}
+function choose(i){
+ const q=currentQ(), buttons=[...document.querySelectorAll(".choice")],fb=document.getElementById("feedback");
+ buttons.forEach((b,n)=>{b.disabled=true;if(n===i)b.classList.add("selected")});
+ let a=q.a[i];
+ addScore(a); clickSound(); saveGame();
+ fb.style.display="block";
+ fb.innerHTML=`<b>${a[0]}. ${a[1]}</b><br>${a[2]||""}<br><span style="font-size:13px;color:#7b6650">선택이 바울의 다음 방향과 엔딩에 반영됩니다.</span>`;
+ document.getElementById("next").style.display="block";
+ speak(a[1]||"좋은 선택입니다.");
+}
+function chooseRoute(){
+ const entries=Object.entries(score);
+ const sorted=entries.sort((a,b)=>b[1]-a[1]);
+ const top=sorted[0][0];
+ routeKey={faith:"teacher",courage:"witness",mission:"pioneer",relationship:"pastor"}[top];
+ // 관계와 선교가 비슷하면 'bridge'를 특별 경로로 배정
+ if(Math.abs(score.mission-score.relationship)<=1 && score.mission+score.relationship>=score.faith+score.courage) routeKey="bridge";
+}
+function nextQuestion(){
+ clickSound(); idx++; saveGame();
+ if(idx===8){chooseRoute();phase="route";showRouteIntro();return}
+ if(idx===16){phase="rome";renderRomeScene();return}
+ if(idx>=20){ending();return}
+ renderQuestion(currentQ());
+}
+function showRouteIntro(){
+ meter.style.width="40%";stage.textContent=`새로운 삶의 길 · ${routes[routeKey].name}`;
+ const r=routes[routeKey];
+ main.innerHTML=`<section class="routecard show"><div class="routeicon">${r.icon}</div><h2>${r.name}</h2><p>${r.desc}</p>
+ <div class="verse"><b>당신의 선택이 만든 방향</b><br>지금부터 8개의 질문은 이 길을 중심으로 전개됩니다. 다른 길을 선택했다면 전혀 다른 바울의 삶이 펼쳐집니다.</div>
+ <button class="startbtn" onclick="renderQuestion(currentQ())">이 길을 계속 걷기 ▶</button></section>`;
+}
+function renderRomeScene(){
+ stage.textContent="마지막 여정 · 로마";meter.style.width="80%";
+ main.innerHTML=`<section class="sceneTransition">
+ <div class="shipscene"><div class="sun" style="right:12%"></div><div class="cloud"></div><div class="cloud c2"></div><div class="waves"></div><div class="boat">⛵</div><div class="rome">🏛️</div><div class="fire">🔥</div></div>
+ <div class="speech"><div class="who">로마로 향하는 바울</div><div class="text" id="dialog">풍랑도, 감옥도, 재판도 나를 막을 수 없었습니다. 이제 로마가 눈앞에 있습니다.</div></div>
+ <button class="next" style="display:block" onclick="renderQuestion(currentQ())">로마를 향해 계속 가기 ▶</button>
+ <div class="stats"><span class="tag">20개의 선택 중 16개 완료</span><span class="tag">${routes[routeKey].name}</span></div>
+ </section>`;
+ speak("풍랑도 감옥도 재판도 나를 막을 수 없었습니다. 이제 로마가 눈앞에 있습니다.");
+}
+function speak(text){
+ if("speechSynthesis" in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="ko-KR";u.rate=.9;u.pitch=.85;speechSynthesis.speak(u)}
+}
+function speakCurrent(){speak(document.getElementById("dialog")?.textContent||"")}
+function ending(){
+ localStorage.removeItem("paulDialogueSave"); successSound(); meter.style.width="100%";stage.textContent="로마 도착 · 당신이 만든 바울";
+ const r=routes[routeKey];
+ const labels={faith:"믿음",courage:"담대함",mission:"선교",relationship:"관계"};
+ const sorted=Object.entries(score).sort((a,b)=>b[1]-a[1]);
+ const strong=labels[sorted[0][0]];
+ main.innerHTML=`<section class="end sceneTransition">
+ <div class="shipscene"><div class="sun" style="right:12%"></div><div class="cloud"></div><div class="cloud c2"></div><div class="waves"></div><div class="boat" style="animation:none">⛵</div><div class="rome">🏛️</div>${paulImg("main","char small")}</div>
+ <h2>🏛️ 로마에 도착했습니다!</h2>
+ <p><b>당신이 만든 바울의 삶</b><br>${r.icon} <b>${r.name}</b> — ${r.desc}</p>
+ <div class="verse"><b>당신의 바울에게 가장 강하게 나타난 성향: ${strong}</b><br>
+ ${strong==="믿음"?"상황이 흔들릴수록 하나님의 약속을 붙드는 바울이 되었습니다.":" "}
+ ${strong==="담대함"?"두려움과 고난 앞에서도 복음을 증언하는 바울이 되었습니다.":" "}
+ ${strong==="선교"?"아무도 가지 않은 길을 찾아 복음의 경계를 넓히는 바울이 되었습니다.":" "}
+ ${strong==="관계"?"동역자와 교회를 세우며 사람을 살리는 바울이 되었습니다.":" "}</div>
+ <div class="stats"><span class="tag">믿음 ${score.faith}</span><span class="tag">담대함 ${score.courage}</span><span class="tag">선교 ${score.mission}</span><span class="tag">관계 ${score.relationship}</span></div>
+ <div class="verse"><b>사도행전 28:31</b><br>“하나님의 나라를 전파하며 주 예수 그리스도에 관한 모든 것을 담대하게 거침없이 가르치더라.”</div>
+ <p>당신의 선택은 여러 방향으로 바울의 삶을 만들었지만, 마지막 목적지는 같았습니다.<br><b>복음을 들고 로마까지.</b></p>
+ <button class="again" onclick="renderStart()">🔄 다른 삶으로 다시 해보기</button>
+ </section>`;
+ speak("하나님의 나라를 전파하며 주 예수 그리스도에 관한 모든 것을 담대하게 거침없이 가르치더라.");
+}
+renderStart();
+</script>
+<script>
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>

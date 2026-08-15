@@ -1,0 +1,10 @@
+{
+  "name": "사도 바울과의 대화게임",
+  "short_name": "사도 바울",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff8e9",
+  "theme_color": "#5b3924",
+  "description": "선택에 따라 달라지는 사도 바울의 삶을 체험하는 대화형 게임"
+}
